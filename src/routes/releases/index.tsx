@@ -68,9 +68,7 @@ function ReleasesPage(): JSX.Element {
                   </time>
                 </div>
 
-                <div className={proseClasses}>
-                  <Markdown>{post.markdown}</Markdown>
-                </div>
+                {post.title}
 
                 {index < posts.length - 1 && (
                   <hr className="mt-12 border-border/50" />
