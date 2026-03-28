@@ -1,14 +1,12 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Link, createFileRoute, notFound, useLocation } from "@tanstack/react-router";
+import { ChevronLeft } from "lucide-react";
 import rehypeHighlight from "rehype-highlight";
-import { useMemo, type JSX, type ReactNode } from "react";
+import remarkGfm from "remark-gfm";
+import { useEffect, useMemo, useState, type JSX, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import type { Components } from "react-markdown";
-import { CopyButton } from "@/components/animate-ui/components/buttons/copy";
 import { Sidebar } from "@/components/docs/Sidebar";
 import { TableOfContents } from "@/components/docs/TableOfContents";
-import { Button } from "@/components/ui/button";
-import { validateSearch, useDocSearchChange } from "@/hooks/useDocSearch";
 import {
   extractHeadings,
   getAllDocs,
@@ -19,7 +17,6 @@ import { generateSlug, proseClasses } from "@/lib/utils";
 
 export const Route = createFileRoute("/docs/$")({
   component: DocPage,
-  validateSearch,
   loader: ({ params }) => {
     const slug = params._splat ?? "";
     const doc = getDocBySlug(slug);
@@ -27,28 +24,17 @@ export const Route = createFileRoute("/docs/$")({
     if (!doc) {
       throw notFound();
     }
-
     return doc;
   },
 });
 
-interface AdjacentDocs {
-  prevDoc: Doc | null;
-  nextDoc: Doc | null;
-}
-
-function getAdjacentDocs(currentSlug: string, docs: Doc[]): AdjacentDocs {
+function getAdjacentDocs(currentSlug: string, docs: Doc[]) {
   const currentIndex = docs.findIndex((doc) => doc.slug === currentSlug);
-
-  if (currentIndex === -1) {
-    return { prevDoc: null, nextDoc: null };
-  }
-
-  const prevDoc = currentIndex > 0 ? docs[currentIndex - 1] : null;
-  const nextDoc =
-    currentIndex < docs.length - 1 ? docs[currentIndex + 1] : null;
-
-  return { prevDoc, nextDoc };
+  if (currentIndex === -1) return { prevDoc: null, nextDoc: null };
+  return {
+    prevDoc: currentIndex > 0 ? docs[currentIndex - 1] : null,
+    nextDoc: currentIndex < docs.length - 1 ? docs[currentIndex + 1] : null,
+  };
 }
 
 function escapeRegex(value: string): string {
@@ -57,101 +43,87 @@ function escapeRegex(value: string): string {
 
 function highlightText(text: string, query: string): ReactNode {
   const trimmedQuery = query.trim();
-  if (!trimmedQuery) {
-    return text;
-  }
-
+  if (!trimmedQuery) return text;
   const regex = new RegExp(`(${escapeRegex(trimmedQuery)})`, "gi");
   const parts = text.split(regex);
-
-  if (parts.length === 1) {
-    return text;
-  }
+  if (parts.length === 1) return text;
 
   return parts.map((part, index) => {
-    if (index % 2 === 0) {
-      return part;
-    }
-
+    if (index % 2 === 0) return part;
     return (
-      <mark
-        key={index}
-        className="bg-primary/30 text-foreground rounded px-0.5"
-      >
+      <mark key={index} className="bg-foreground/20 rounded px-0.5">
         {part}
       </mark>
     );
   });
 }
 
-function wrapHighlightedChildren(
-  children: ReactNode,
-  query: string,
-): ReactNode {
-  if (!query.trim()) {
-    return children;
-  }
-
-  if (typeof children === "string") {
-    return highlightText(children, query);
-  }
-
+function wrapHighlightedChildren(children: ReactNode, query: string): ReactNode {
+  if (!query.trim()) return children;
+  if (typeof children === "string") return highlightText(children, query);
   if (Array.isArray(children)) {
-    return children.map((child, index) => {
-      if (typeof child !== "string") {
-        return child;
-      }
-
-      return <span key={index}>{highlightText(child, query)}</span>;
-    });
+    return children.map((child, index) =>
+      typeof child === "string" ? (
+        <span key={index}>{highlightText(child, query)}</span>
+      ) : (
+        child
+      )
+    );
   }
-
   return children;
 }
 
-function renderHeading(
-  tagName: "h2" | "h3" | "h4",
-  children: ReactNode,
-  query: string,
-): JSX.Element {
-  const id = generateSlug(String(children));
-  const content = wrapHighlightedChildren(children, query);
+function createMarkdownComponents(query: string, slug: string): Components {
+  const HeadingWithLink = ({ 
+    Tag, 
+    children 
+  }: { 
+    Tag: "h2" | "h3" | "h4"; 
+    children: ReactNode 
+  }): JSX.Element => {
+    const id = generateSlug(String(children));
+    const content = wrapHighlightedChildren(children, query);
+    const [copied, setCopied] = useState(false);
+    
+    const handleCopyLink = () => {
+      const url = `${window.location.origin}/docs/${slug}#${id}`;
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
 
-  if (tagName === "h2") {
     return (
-      <h2 id={id} className="scroll-mt-24">
+      <Tag id={id} className="scroll-mt-24 font-semibold group flex items-center gap-2">
         {content}
-      </h2>
+        <button
+          onClick={handleCopyLink}
+          className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+          title={copied ? "Copied!" : "Copy link to section"}
+        >
+          {copied ? (
+            <span className="text-xs">Copied!</span>
+          ) : (
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+            </svg>
+          )}
+        </button>
+      </Tag>
     );
-  }
+  };
 
-  if (tagName === "h3") {
-    return (
-      <h3 id={id} className="scroll-mt-24">
-        {content}
-      </h3>
-    );
-  }
-
-  return (
-    <h4 id={id} className="scroll-mt-24">
-      {content}
-    </h4>
-  );
-}
-
-function createMarkdownComponents(query: string): Components {
   return {
-    h2: ({ children }) => renderHeading("h2", children, query),
-    h3: ({ children }) => renderHeading("h3", children, query),
-    h4: ({ children }) => renderHeading("h4", children, query),
+    h2: ({ children }) => <HeadingWithLink Tag="h2" children={children} />,
+    h3: ({ children }) => <HeadingWithLink Tag="h3" children={children} />,
+    h4: ({ children }) => <HeadingWithLink Tag="h4" children={children} />,
     p: ({ children }) => <p>{wrapHighlightedChildren(children, query)}</p>,
     li: ({ children }) => <li>{wrapHighlightedChildren(children, query)}</li>,
-    strong: ({ children }) => (
-      <strong>{wrapHighlightedChildren(children, query)}</strong>
-    ),
+    strong: ({ children }) => <strong>{wrapHighlightedChildren(children, query)}</strong>,
     em: ({ children }) => <em>{wrapHighlightedChildren(children, query)}</em>,
     pre: ({ children }) => {
+      const [copied, setCopied] = useState(false);
+      
       let content = "";
       if (
         children &&
@@ -162,194 +134,140 @@ function createMarkdownComponents(query: string): Components {
         "children" in children.props
       ) {
         const codeChildren = children.props.children;
-        if (typeof codeChildren === "string") {
-          content = codeChildren;
-        } else if (Array.isArray(codeChildren)) {
-          content = codeChildren.join("");
-        }
+        content = typeof codeChildren === "string" ? codeChildren : codeChildren.join("");
       }
 
+      const handleCopy = () => {
+        navigator.clipboard.writeText(content.replace(/\n$/, ""));
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      };
+
       return (
-        <div className="relative group">
-          <CopyButton
-            content={content.replace(/\n$/, "")}
-            variant="outline"
-            size="xs"
-            className="absolute right-2 top-2 z-10 opacity-0 transition-opacity group-hover:opacity-100"
-            aria-label="Copy code"
-            title="Copy code"
-          />
-          <pre>{children}</pre>
+        <div className="relative group my-4">
+          <button
+            onClick={handleCopy}
+            className="absolute right-2 top-2 text-xs text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity min-w-[50px] text-right"
+          >
+            {copied ? "Copied!" : "Copy"}
+          </button>
+          <pre className="bg-secondary rounded-lg p-4 overflow-x-auto text-sm m-0">{children}</pre>
         </div>
       );
     },
+    code: ({ children }) => (
+      <code className="bg-secondary px-1.5 py-0.5 rounded text-sm">{children}</code>
+    ),
   };
 }
 
 function DocPage(): JSX.Element {
   const doc = Route.useLoaderData();
-  const { q: search = "" } = Route.useSearch();
+  const location = useLocation();
   const allDocs = getAllDocs();
   const { prevDoc, nextDoc } = getAdjacentDocs(doc.slug, allDocs);
   const headings = extractHeadings(doc.content);
-  const handleSearchChange = useDocSearchChange(Route.fullPath);
+
+  // Get search query from URL if present
+  const searchParams = new URLSearchParams(location.search);
+  const highlightQuery = searchParams.get("q") || "";
+
+  // Handle hash scroll on page load
+  useEffect(() => {
+    const hash = location.hash;
+    if (hash) {
+      setTimeout(() => {
+        const element = document.getElementById(hash.slice(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  }, [location.hash]);
 
   const markdownComponents = useMemo(
-    () => createMarkdownComponents(search),
-    [search],
+    () => createMarkdownComponents(highlightQuery, doc.slug),
+    [highlightQuery, doc.slug]
   );
 
   return (
-    <section className="pt-24 pb-20">
-      <div className="flex gap-8">
-        <Sidebar
-          currentSlug={doc.slug}
-          search={search}
-          onSearchChange={handleSearchChange}
-        />
+    <section className="pt-24 pb-20 px-5">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex gap-8">
+          {/* Sidebar */}
+          <Sidebar currentSlug={doc.slug} />
 
-        <main className="flex-1 min-w-0">
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="lg:hidden mb-6 text-muted-foreground hover:text-foreground"
-          >
-            <Link to="/docs">
+          {/* Main content */}
+          <main className="flex-1 min-w-0 max-w-2xl">
+            {/* Mobile back link */}
+            <Link
+              to="/docs"
+              className="lg:hidden inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+            >
               <ChevronLeft className="w-4 h-4" />
               All docs
             </Link>
-          </Button>
 
-          <div className="lg:hidden mb-6">
-            <SearchInput value={search} onChange={handleSearchChange} />
-          </div>
+            {/* Highlight indicator */}
+            {highlightQuery && (
+              <div className="mb-4 text-sm text-muted-foreground">
+                Highlighting: <span className="font-medium">{highlightQuery}</span>
+              </div>
+            )}
 
-          {search && (
-            <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Highlighting: </span>
-              <span className="px-2 py-0.5 bg-primary/20 text-primary rounded font-medium">
-                {search}
-              </span>
+            {/* Header */}
+            <div className="mb-8">
+              {doc.category && (
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                  {doc.category}
+                </span>
+              )}
+              <h1 className="text-2xl font-semibold mt-1">{doc.title}</h1>
+              {doc.description && <p className="mt-2 text-muted-foreground">{doc.description}</p>}
             </div>
-          )}
 
-          <div className="mb-8">
-            {doc.category && (
-              <span className="text-sm text-primary font-medium">
-                {doc.category}
-              </span>
-            )}
-            <h1 className="text-3xl md:text-4xl font-bold mt-1">{doc.title}</h1>
-            {doc.description && (
-              <p className="mt-3 text-muted-foreground">{doc.description}</p>
-            )}
-          </div>
-
-          <div className={`${proseClasses} prose-li:text-muted-foreground`}>
-            <Markdown
-              components={markdownComponents}
-              rehypePlugins={[rehypeHighlight]}
-            >
-              {doc.content}
-            </Markdown>
-          </div>
-
-          <div className="mt-12 pt-8 border-t border-border/50 flex flex-col sm:flex-row justify-between gap-4">
-            {prevDoc ? (
-              <Link
-                to="/docs/$"
-                params={{ _splat: prevDoc.slug }}
-                className="flex-1 p-4 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-card/30 transition-all group"
+            {/* Content */}
+            <div className={`${proseClasses} max-w-none`}>
+              <Markdown 
+                components={markdownComponents} 
+                rehypePlugins={[rehypeHighlight]}
+                remarkPlugins={[remarkGfm]}
               >
-                <span className="text-xs text-muted-foreground">Previous</span>
-                <div className="flex items-center gap-2 mt-1">
-                  <ChevronLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span className="font-medium text-foreground group-hover:text-primary transition-colors">
-                    {prevDoc.title}
-                  </span>
-                </div>
-              </Link>
-            ) : (
-              <div className="flex-1" />
-            )}
+                {doc.content}
+              </Markdown>
+            </div>
 
-            {nextDoc ? (
-              <Link
-                to="/docs/$"
-                params={{ _splat: nextDoc.slug }}
-                className="flex-1 p-4 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-card/30 transition-all group sm:text-right"
-              >
-                <span className="text-xs text-muted-foreground">Next</span>
-                <div className="flex items-center sm:justify-end gap-2 mt-1">
-                  <span className="font-medium text-foreground group-hover:text-primary transition-colors">
-                    {nextDoc.title}
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-              </Link>
-            ) : (
-              <div className="flex-1" />
-            )}
-          </div>
-        </main>
+            {/* Prev/Next navigation */}
+            <div className="mt-12 pt-8 border-t border-border/30 flex justify-between gap-4">
+              {prevDoc ? (
+                <Link
+                  to="/docs/$"
+                  params={{ _splat: prevDoc.slug }}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  ← {prevDoc.title}
+                </Link>
+              ) : (
+                <span />
+              )}
+              {nextDoc ? (
+                <Link
+                  to="/docs/$"
+                  params={{ _splat: nextDoc.slug }}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {nextDoc.title} →
+                </Link>
+              ) : (
+                <span />
+              )}
+            </div>
+          </main>
 
-        <TableOfContents headings={headings} />
+          {/* TOC */}
+          <TableOfContents headings={headings} />
+        </div>
       </div>
     </section>
-  );
-}
-
-function SearchInput({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="relative">
-      <svg
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-      <input
-        type="text"
-        placeholder="Search docs..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full pl-9 pr-8 py-2 text-sm bg-secondary/50 border border-border/50 rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-colors"
-      />
-      {value && (
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      )}
-    </div>
   );
 }

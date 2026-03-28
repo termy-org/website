@@ -61,49 +61,49 @@
   --color-ring: var(--ring);
 }
 
-/* Dark theme — clean minimal */
+/* Dark theme — monochrome */
 :root {
   --radius: 0.75rem;
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --card: #111111;
-  --card-foreground: #fafafa;
-  --popover: #111111;
-  --popover-foreground: #fafafa;
-  --primary: #22c55e;
-  --primary-foreground: #052e16;
-  --secondary: #171717;
-  --secondary-foreground: #fafafa;
-  --muted: #171717;
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #0a0a0a;
+  --card-foreground: #ffffff;
+  --popover: #0a0a0a;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  --muted: #1a1a1a;
   --muted-foreground: #737373;
-  --accent: #171717;
-  --accent-foreground: #fafafa;
+  --accent: #1a1a1a;
+  --accent-foreground: #ffffff;
   --destructive: #ef4444;
-  --border: #1a1a1a;
-  --input: #1a1a1a;
-  --ring: #22c55e;
+  --border: #262626;
+  --input: #262626;
+  --ring: #404040;
 }
 
-/* Light theme — clean minimal */
+/* Light theme — monochrome */
 .light {
-  --background: #fafafa;
-  --foreground: #0a0a0a;
-  --card: #ffffff;
-  --card-foreground: #0a0a0a;
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
-  --primary: #16a34a;
-  --primary-foreground: #f0fdf4;
-  --secondary: #f5f5f5;
-  --secondary-foreground: #0a0a0a;
-  --muted: #f5f5f5;
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #fafafa;
+  --card-foreground: #000000;
+  --popover: #fafafa;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f0f0;
+  --secondary-foreground: #000000;
+  --muted: #f0f0f0;
   --muted-foreground: #525252;
-  --accent: #f5f5f5;
-  --accent-foreground: #0a0a0a;
+  --accent: #f0f0f0;
+  --accent-foreground: #000000;
   --destructive: #dc2626;
   --border: #e5e5e5;
   --input: #e5e5e5;
-  --ring: #16a34a;
+  --ring: #a3a3a3;
 }
 
 @layer base {
@@ -117,34 +117,9 @@
   }
 }
 
-/* Gradient text — green only */
-.gradient-text {
-  @apply bg-clip-text text-transparent;
-  background-image: linear-gradient(135deg, #4ade80 0%, #86efac 100%);
-}
 
-.light .gradient-text {
-  background-image: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
-}
 
-/* Blur fade-in animation */
-@keyframes blur-fade-in {
-  from {
-    opacity: 0;
-    filter: blur(8px);
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-  }
-}
 
-.animate-blur-in {
-  animation: blur-fade-in 0.4s ease-out forwards;
-  opacity: 0;
-}
 
 /* Terminal window styling — matches Termy app */
 .terminal-window {
@@ -262,50 +237,111 @@
   color: #5c6370;
 }
 
-/* Docs code highlighting */
+/* Docs code highlighting — Tokyo Night theme */
 .prose pre code.hljs {
   display: block;
   background: transparent;
   padding: 0;
   border-radius: 0;
-  color: #d4d4d4;
+  color: #a9b1d6;
 }
 
+/* Keywords — purple/magenta */
 .prose pre code .hljs-keyword,
 .prose pre code .hljs-selector-tag,
 .prose pre code .hljs-literal,
-.prose pre code .hljs-built_in {
-  color: #c586c0;
+.prose pre code .hljs-built_in,
+.prose pre code .hljs-builtin-name {
+  color: #bb9af7;
 }
 
+/* Functions, classes — blue */
 .prose pre code .hljs-title,
 .prose pre code .hljs-title.class_,
-.prose pre code .hljs-title.function_ {
-  color: #4ec9b0;
+.prose pre code .hljs-title.function_,
+.prose pre code .hljs-function {
+  color: #7aa2f7;
 }
 
+/* Strings — green */
 .prose pre code .hljs-string,
 .prose pre code .hljs-attr,
 .prose pre code .hljs-template-tag,
-.prose pre code .hljs-template-variable {
-  color: #ce9178;
+.prose pre code .hljs-template-variable,
+.prose pre code .hljs-regexp {
+  color: #9ece6a;
 }
 
+/* Numbers, constants — orange/yellow */
 .prose pre code .hljs-number,
 .prose pre code .hljs-symbol,
-.prose pre code .hljs-bullet {
-  color: #b5cea8;
+.prose pre code .hljs-bullet,
+.prose pre code .hljs-meta {
+  color: #ff9e64;
 }
 
+/* Comments — darker gray/blue */
 .prose pre code .hljs-comment,
 .prose pre code .hljs-quote {
-  color: #6a9955;
+  color: #565f89;
+  font-style: italic;
 }
 
+/* Variables, params — cyan/teal */
 .prose pre code .hljs-variable,
 .prose pre code .hljs-params,
-.prose pre code .hljs-property {
-  color: #9cdcfe;
+.prose pre code .hljs-property,
+.prose pre code .hljs-attribute {
+  color: #73daca;
+}
+
+/* Operators, punctuation — light gray */
+.prose pre code .hljs-operator,
+.prose pre code .hljs-punctuation {
+  color: #a9b1d6;
+}
+
+/* Types — yellow/gold */
+.prose pre code .hljs-type,
+.prose pre code .hljs-class .hljs-title {
+  color: #e0af68;
+}
+
+/* Tags (HTML/XML) — red */
+.prose pre code .hljs-tag {
+  color: #f7768e;
+}
+
+/* Tag names — blue */
+.prose pre code .hljs-name,
+.prose pre code .hljs-tag .hljs-name {
+  color: #f7768e;
+}
+
+/* Attributes — teal */
+.prose pre code .hljs-attr {
+  color: #73daca;
+}
+
+/* Sections — brighter purple */
+.prose pre code .hljs-section {
+  color: #bb9af7;
+}
+
+/* Links — underline */
+.prose pre code .hljs-link {
+  color: #7aa2f7;
+  text-decoration: underline;
+}
+
+/* Emphasis */
+.prose pre code .hljs-emphasis {
+  font-style: italic;
+}
+
+/* Strong */
+.prose pre code .hljs-strong {
+  font-weight: bold;
 }
 
 .terminal-dots {
@@ -374,5 +410,15 @@ html {
 
 /* Selection */
 ::selection {
-  @apply bg-primary/30 text-foreground;
+  @apply bg-foreground/20 text-foreground;
+}
+
+/* Subtle transitions */
+button, a {
+  @apply transition-colors duration-150;
+}
+
+/* Clean focus states */
+*:focus-visible {
+  @apply outline-none ring-2 ring-foreground/20;
 }

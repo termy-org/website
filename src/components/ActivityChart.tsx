@@ -1,56 +1,25 @@
-import type { JSX } from "react";
-import { BarChart, Bar, ResponsiveContainer, Tooltip } from "recharts";
-import type { ContributorWeek } from "@/hooks/useContributors";
-
 interface ActivityChartProps {
-  weeks: ContributorWeek[];
+  weeks: { w: number; a: number; d: number; c: number }[];
 }
 
-interface WeekData {
-  commits: number;
-  label: string;
-}
-
-function formatWeekLabel(timestamp: number): string {
-  const date = new Date(timestamp * 1000);
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
-export function ActivityChart({ weeks }: ActivityChartProps): JSX.Element {
-  const recentWeeks = weeks.slice(-12);
-
-  const data: WeekData[] = recentWeeks.map((week) => ({
-    commits: week.c,
-    label: formatWeekLabel(week.w),
-  }));
+export function ActivityChart({ weeks }: ActivityChartProps) {
+  // Show last 16 weeks of activity
+  const recentWeeks = weeks.slice(-16);
+  const maxCommits = Math.max(...recentWeeks.map((w) => w.c), 1);
 
   return (
-    <div className="w-full h-12">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} barCategoryGap={2}>
-          <Tooltip
-            cursor={false}
-            contentStyle={{
-              backgroundColor: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: "8px",
-              fontSize: "12px",
-              padding: "4px 8px",
-            }}
-            labelStyle={{ color: "hsl(var(--muted-foreground))" }}
-            itemStyle={{ color: "hsl(var(--foreground))" }}
-            formatter={(value: unknown) => [`${value} commits`, ""]}
-            labelFormatter={(label: unknown) => String(label)}
+    <div className="flex items-end gap-1 h-8">
+      {recentWeeks.map((week, i) => {
+        const height = Math.max((week.c / maxCommits) * 100, 10);
+        return (
+          <div
+            key={i}
+            className="flex-1 bg-foreground/20 rounded-sm"
+            style={{ height: `${height}%`, minHeight: 2 }}
+            title={`${week.c} commits`}
           />
-          <Bar
-            dataKey="commits"
-            fill="hsl(var(--primary))"
-            fillOpacity={0.5}
-            radius={[2, 2, 0, 0]}
-            name="commits"
-          />
-        </BarChart>
-      </ResponsiveContainer>
+        );
+      })}
     </div>
   );
 }
