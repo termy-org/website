@@ -7,6 +7,8 @@ category: Guides
 
 # Building Termy from Source
 
+> For: developers and contributors
+
 This guide covers building Termy from source. Useful for:
 - Developers contributing to Termy
 - Users on unsupported platforms
@@ -289,6 +291,8 @@ export RUSTC_WRAPPER=sccache
 
 ## Contributing
 
+Termy welcomes bug reports, feature requests, code, docs, and themes. The GitHub repository is the single source for all contribution guidelines — this section covers the conventions most worth knowing up front.
+
 ### Before Submitting
 
 1. **Format code**: `cargo fmt`
@@ -309,6 +313,18 @@ export RUSTC_WRAPPER=sccache
 feat: Add tab search functionality
 fix: Correct cursor position after resize
 docs: Update installation guide
+```
+
+### Submitting a Theme
+
+Themes are a `[colors]` block in `config.txt` format. To contribute one, open a pull request adding it under the built-in themes:
+
+```txt
+[colors]
+background = #1e1e2e
+foreground = #cdd6f4
+blue = #89b4fa
+# ...full palette
 ```
 
 ---
@@ -340,8 +356,43 @@ tar -czf termy-linux-x64.tar.gz -C target/release termy
 
 ---
 
+## Architecture Notes
+
+This section captures ownership boundaries for command and keybind behavior — useful when adding a new command, a new keybind directive, or a new UI adapter.
+
+### Ownership
+
+- `termy_command_core` owns:
+  - Command IDs and config-facing command names.
+  - Command config-name parsing and normalization.
+  - Keybind defaults.
+  - Keybind directive parsing (`clear`, bind, unbind).
+  - Deterministic keybind resolution order.
+- App/CLI adapters own:
+  - UI labels, keywords, and command-palette presentation.
+  - Platform-specific visibility policy for palette entries.
+  - UI trigger canonicalization and validation (for example GPUI keystroke parsing).
+
+### Dependency Rule
+
+- `termy_command_core` must remain a pure domain crate.
+- `termy_command_core` must not depend on:
+  - `termy_config_core`
+  - `gpui`
+  - other UI or presentation crates
+
+### Integration Pattern
+
+- Adapters convert parsed config keybind lines into `termy_command_core::KeybindLineRef`.
+- Adapters call `parse_keybind_directives_from_iter`; trigger canonicalization happens in `termy_command_core`.
+- Adapters call `resolve_keybinds` over `default_resolved_keybinds`.
+
+This keeps one canonical command/keybind engine while preserving thin, readable adapter code.
+
+---
+
 ## Next Steps
 
-- Read the [Architecture Guide](/docs/architecture/command-boundary) to understand the codebase
+- Skim the [Architecture Notes](#architecture-notes) above to understand the command/keybind boundary.
 - Check [Contributing Guidelines](https://github.com/lassejlv/termy/blob/main/CONTRIBUTING.md)
 - Join the [Discord](https://discord.gg/4VDBFD7vAp) for help

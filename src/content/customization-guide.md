@@ -7,6 +7,8 @@ category: Guides
 
 # Customization Guide
 
+> For: end users
+
 This guide covers everything you can customize in Termy. From subtle tweaks to complete overhauls, make Termy work exactly how you want.
 
 ---
@@ -21,12 +23,19 @@ Termy uses a simple text-based configuration at:
 
 ### File Structure
 
-```txt
-# Comments start with #
-key = value
+Termy's config is plain text: one `key = value` per line, `#` starts a comment, and `[colors]` introduces the color override section.
 
-[section]
-key = value
+```txt
+# Top-level settings
+font_family = JetBrains Mono
+font_size = 14
+theme = termy
+background_opacity = 0.95
+
+# Section for color overrides
+[colors]
+background = #1e1e2e
+foreground = #cdd6f4
 ```
 
 ### Creating Your Config
@@ -36,7 +45,7 @@ mkdir -p ~/.config/termy
 touch ~/.config/termy/config.txt
 ```
 
-Changes apply immediately—no restart required!
+Changes apply immediately — no restart required.
 
 ---
 
@@ -76,10 +85,6 @@ font_size = 14          # Pixels
 
 Tip: Use `Cmd/Ctrl + =` and `Cmd/Ctrl + -` for temporary zooming.
 
-### Font Weight (Future)
-
-Coming in a future release: separate control for bold text weight.
-
 ---
 
 ## Window Appearance
@@ -87,7 +92,7 @@ Coming in a future release: separate control for bold text weight.
 ### Background Opacity
 
 ```txt
-background_opacity = 0.95     # 0.0 (invisible) to 1.0 (opaque)
+background_opacity = 0.95     # 0.0 (fully transparent) to 1.0 (opaque)
 ```
 
 For a true transparent terminal:
@@ -157,13 +162,13 @@ Set to `false` for a solid cursor.
 ### Lines to Keep
 
 ```txt
-scrollback_history = 10000    # Lines in scrollback
+scrollback_history = 10000    # Lines in scrollback (default: 2000)
 ```
 
-Higher values use more memory. Recommended:
-- Low (2500): Minimal memory
-- Medium (10000): Default balance
-- High (50000): Extensive history
+Higher values use more memory. Choose by workload:
+- Default (2000): Conservative, low memory
+- Moderate (10000): Comfortable for most shells
+- High (50000): Long-running sessions with heavy output
 
 ### Inactive Tab Behavior
 
@@ -297,10 +302,6 @@ bright_cyan = #a4ffff
 bright_white = #ffffff
 ```
 
-### Opacity by Color
-
-Coming soon: Set specific alpha for background colors.
-
 ---
 
 ## Shell Integration
@@ -402,35 +403,9 @@ inactive_tab_scrollback = 1000
 
 ---
 
-## Troubleshooting Customization
+## When Customization Doesn't Stick
 
-### Config Not Applying
-
-1. Check file location: `~/.config/termy/config.txt`
-2. Verify syntax: `key = value` (spaces around `=`)
-3. Check for typos in keys
-4. Restart Termy if needed
-
-### Font Not Found
-
-```bash
-# Test if font exists
-fc-match "Your Font Name"
-```
-
-Use exact family name from font list.
-
-### Broken Config
-
-If Termy won't start:
-
-```bash
-# Backup and reset
-mv ~/.config/termy/config.txt ~/.config/termy/config.txt.backup
-termy  # Should start with defaults
-
-# Restore parts of config gradually
-```
+For the checklist of why a config change isn't applying, how to recover from a broken config, and how to diagnose missing fonts, see [Troubleshooting → Config Issues](/docs/troubleshooting#config-issues) and [Troubleshooting → Font Rendering Issues](/docs/troubleshooting#font-rendering-issues).
 
 ---
 

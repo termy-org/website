@@ -1,11 +1,13 @@
 ---
 title: First Steps
 description: Your complete onboarding guide to becoming productive with Termy
-order: 3
+order: 1
 category: Getting Started
 ---
 
 # First Steps with Termy
+
+> For: end users
 
 Welcome to Termy! This guide will get you from first launch to productive workflows in minutes. Follow along step-by-step or jump to sections that interest you.
 
@@ -72,7 +74,7 @@ Master these and you'll fly through Termy:
 
 ## The Command Palette
 
-The Command Palette is your control center. Access it with `Cmd/Ctrl + P`.
+The Command Palette is a fuzzy-search overlay for every action Termy can perform. Press `Cmd/Ctrl + P` to open it, start typing to filter, then press `Enter` to execute the highlighted entry.
 
 ### What You Can Do
 
@@ -122,7 +124,7 @@ padding_y = 8
 # Terminal
 cursor_style = block
 cursor_blink = true
-scrollback_history = 10000
+scrollback_history = 10000    # Increase from the default of 2000
 ```
 
 Changes apply immediately—no restart needed!
@@ -201,21 +203,26 @@ Press `Cmd/Ctrl + F` to search in the terminal buffer.
 
 ## Shell Integration
 
-Termy exports environment variables your shell can use:
+Termy sets a handful of environment variables in every shell it spawns. There's nothing to install or enable — they're available as soon as your prompt appears:
 
 ```bash
-# These are set automatically
-TERMY=1                    # Indicates Termy environment
-TERMY_PID=12345           # Termy process ID
-TERMY_TAB_ID=1            # Current tab ID
+TERMY=1                    # Present in every Termy shell
+TERMY_PID=12345            # PID of the Termy process hosting this tab
+TERMY_TAB_ID=1             # Tab ID, unique within the window
+```
+
+Verify they're set:
+
+```bash
+env | grep TERMY
 ```
 
 ### Customizing Your Shell
 
-Add to your `.bashrc` or `.zshrc`:
+Because `TERMY` is only present inside Termy, you can use it to gate Termy-only tweaks in your shell startup file (`.bashrc`, `.zshrc`, `config.fish`, etc.):
 
 ```bash
-# Change prompt when in Termy
+# Add a rocket to your prompt only when you're running inside Termy
 if [ -n "$TERMY" ]; then
     export PS1="🚀 $PS1"
 fi

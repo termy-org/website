@@ -1,7 +1,7 @@
 ---
 title: Keybindings
 description: Keyboard shortcuts and customization
-order: 2
+order: 3
 category: Getting Started
 ---
 

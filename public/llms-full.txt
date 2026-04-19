@@ -5,47 +5,6 @@ Generated from https://github.com/lassejlv/termy
 
 ---
 
-# Architecture
-
-## Command Boundary
-
-> Ownership boundaries for command and keybind behavior
-
-URL: https://termy.run/docs/architecture/command-boundary
-
-This document defines ownership boundaries for command and keybind behavior.
-
-## Ownership
-
-- `termy_command_core` owns:
-  - Command IDs and config-facing command names.
-  - Command config-name parsing and normalization.
-  - Keybind defaults.
-  - Keybind directive parsing (`clear`, bind, unbind).
-  - Deterministic keybind resolution order.
-- App/CLI adapters own:
-  - UI labels, keywords, and command-palette presentation.
-  - Platform-specific visibility policy for palette entries.
-  - UI trigger canonicalization and validation (for example GPUI keystroke parsing).
-
-## Dependency Rule
-
-- `termy_command_core` must remain a pure domain crate.
-- `termy_command_core` must not depend on:
-  - `termy_config_core`
-  - `gpui`
-  - other UI or presentation crates
-
-## Integration Pattern
-
-- Adapters convert parsed config keybind lines into `termy_command_core::KeybindLineRef`.
-- Adapters call `parse_keybind_directives_from_iter`; trigger canonicalization happens in `termy_command_core`.
-- Adapters call `resolve_keybinds` over `default_resolved_keybinds`.
-
-This keeps one canonical command/keybind engine while preserving thin and readable adapter code.
-
----
-
 # Guides
 
 ## Building from Source
@@ -55,6 +14,8 @@ This keeps one canonical command/keybind engine while preserving thin and readab
 URL: https://termy.run/docs/building-from-source
 
 # Building Termy from Source
+
+> For: developers and contributors
 
 This guide covers building Termy from source. Useful for:
 - Developers contributing to Termy
@@ -338,6 +299,8 @@ export RUSTC_WRAPPER=sccache
 
 ## Contributing
 
+Termy welcomes bug reports, feature requests, code, docs, and themes. The GitHub repository is the single source for all contribution guidelines — this section covers the conventions most worth knowing up front.
+
 ### Before Submitting
 
 1. **Format code**: `cargo fmt`
@@ -358,6 +321,18 @@ export RUSTC_WRAPPER=sccache
 feat: Add tab search functionality
 fix: Correct cursor position after resize
 docs: Update installation guide
+```
+
+### Submitting a Theme
+
+Themes are a `[colors]` block in `config.txt` format. To contribute one, open a pull request adding it under the built-in themes:
+
+```txt
+[colors]
+background = #1e1e2e
+foreground = #cdd6f4
+blue = #89b4fa
+# ...full palette
 ```
 
 ---
@@ -389,9 +364,44 @@ tar -czf termy-linux-x64.tar.gz -C target/release termy
 
 ---
 
+## Architecture Notes
+
+This section captures ownership boundaries for command and keybind behavior — useful when adding a new command, a new keybind directive, or a new UI adapter.
+
+### Ownership
+
+- `termy_command_core` owns:
+  - Command IDs and config-facing command names.
+  - Command config-name parsing and normalization.
+  - Keybind defaults.
+  - Keybind directive parsing (`clear`, bind, unbind).
+  - Deterministic keybind resolution order.
+- App/CLI adapters own:
+  - UI labels, keywords, and command-palette presentation.
+  - Platform-specific visibility policy for palette entries.
+  - UI trigger canonicalization and validation (for example GPUI keystroke parsing).
+
+### Dependency Rule
+
+- `termy_command_core` must remain a pure domain crate.
+- `termy_command_core` must not depend on:
+  - `termy_config_core`
+  - `gpui`
+  - other UI or presentation crates
+
+### Integration Pattern
+
+- Adapters convert parsed config keybind lines into `termy_command_core::KeybindLineRef`.
+- Adapters call `parse_keybind_directives_from_iter`; trigger canonicalization happens in `termy_command_core`.
+- Adapters call `resolve_keybinds` over `default_resolved_keybinds`.
+
+This keeps one canonical command/keybind engine while preserving thin, readable adapter code.
+
+---
+
 ## Next Steps
 
-- Read the [Architecture Guide](/docs/architecture/command-boundary) to understand the codebase
+- Skim the [Architecture Notes](#architecture-notes) above to understand the command/keybind boundary.
 - Check [Contributing Guidelines](https://github.com/lassejlv/termy/blob/main/CONTRIBUTING.md)
 - Join the [Discord](https://discord.gg/4VDBFD7vAp) for help
 
@@ -404,6 +414,8 @@ tar -czf termy-linux-x64.tar.gz -C target/release termy
 URL: https://termy.run/docs/customization-guide
 
 # Customization Guide
+
+> For: end users
 
 This guide covers everything you can customize in Termy. From subtle tweaks to complete overhauls, make Termy work exactly how you want.
 
@@ -419,12 +431,19 @@ Termy uses a simple text-based configuration at:
 
 ### File Structure
 
-```txt
-# Comments start with #
-key = value
+Termy's config is plain text: one `key = value` per line, `#` starts a comment, and `[colors]` introduces the color override section.
 
-[section]
-key = value
+```txt
+# Top-level settings
+font_family = JetBrains Mono
+font_size = 14
+theme = termy
+background_opacity = 0.95
+
+# Section for color overrides
+[colors]
+background = #1e1e2e
+foreground = #cdd6f4
 ```
 
 ### Creating Your Config
@@ -434,7 +453,7 @@ mkdir -p ~/.config/termy
 touch ~/.config/termy/config.txt
 ```
 
-Changes apply immediately—no restart required!
+Changes apply immediately — no restart required.
 
 ---
 
@@ -474,10 +493,6 @@ font_size = 14          # Pixels
 
 Tip: Use `Cmd/Ctrl + =` and `Cmd/Ctrl + -` for temporary zooming.
 
-### Font Weight (Future)
-
-Coming in a future release: separate control for bold text weight.
-
 ---
 
 ## Window Appearance
@@ -485,7 +500,7 @@ Coming in a future release: separate control for bold text weight.
 ### Background Opacity
 
 ```txt
-background_opacity = 0.95     # 0.0 (invisible) to 1.0 (opaque)
+background_opacity = 0.95     # 0.0 (fully transparent) to 1.0 (opaque)
 ```
 
 For a true transparent terminal:
@@ -555,13 +570,13 @@ Set to `false` for a solid cursor.
 ### Lines to Keep
 
 ```txt
-scrollback_history = 10000    # Lines in scrollback
+scrollback_history = 10000    # Lines in scrollback (default: 2000)
 ```
 
-Higher values use more memory. Recommended:
-- Low (2500): Minimal memory
-- Medium (10000): Default balance
-- High (50000): Extensive history
+Higher values use more memory. Choose by workload:
+- Default (2000): Conservative, low memory
+- Moderate (10000): Comfortable for most shells
+- High (50000): Long-running sessions with heavy output
 
 ### Inactive Tab Behavior
 
@@ -695,10 +710,6 @@ bright_cyan = #a4ffff
 bright_white = #ffffff
 ```
 
-### Opacity by Color
-
-Coming soon: Set specific alpha for background colors.
-
 ---
 
 ## Shell Integration
@@ -800,35 +811,9 @@ inactive_tab_scrollback = 1000
 
 ---
 
-## Troubleshooting Customization
+## When Customization Doesn't Stick
 
-### Config Not Applying
-
-1. Check file location: `~/.config/termy/config.txt`
-2. Verify syntax: `key = value` (spaces around `=`)
-3. Check for typos in keys
-4. Restart Termy if needed
-
-### Font Not Found
-
-```bash
-# Test if font exists
-fc-match "Your Font Name"
-```
-
-Use exact family name from font list.
-
-### Broken Config
-
-If Termy won't start:
-
-```bash
-# Backup and reset
-mv ~/.config/termy/config.txt ~/.config/termy/config.txt.backup
-termy  # Should start with defaults
-
-# Restore parts of config gradually
-```
+For the checklist of why a config change isn't applying, how to recover from a broken config, and how to diagnose missing fonts, see [Troubleshooting → Config Issues](/docs/troubleshooting#config-issues) and [Troubleshooting → Font Rendering Issues](/docs/troubleshooting#font-rendering-issues).
 
 ---
 
@@ -1128,6 +1113,8 @@ URL: https://termy.run/docs/first-steps
 
 # First Steps with Termy
 
+> For: end users
+
 Welcome to Termy! This guide will get you from first launch to productive workflows in minutes. Follow along step-by-step or jump to sections that interest you.
 
 ---
@@ -1193,7 +1180,7 @@ Master these and you'll fly through Termy:
 
 ## The Command Palette
 
-The Command Palette is your control center. Access it with `Cmd/Ctrl + P`.
+The Command Palette is a fuzzy-search overlay for every action Termy can perform. Press `Cmd/Ctrl + P` to open it, start typing to filter, then press `Enter` to execute the highlighted entry.
 
 ### What You Can Do
 
@@ -1243,7 +1230,7 @@ padding_y = 8
 # Terminal
 cursor_style = block
 cursor_blink = true
-scrollback_history = 10000
+scrollback_history = 10000    # Increase from the default of 2000
 ```
 
 Changes apply immediately—no restart needed!
@@ -1322,21 +1309,26 @@ Press `Cmd/Ctrl + F` to search in the terminal buffer.
 
 ## Shell Integration
 
-Termy exports environment variables your shell can use:
+Termy sets a handful of environment variables in every shell it spawns. There's nothing to install or enable — they're available as soon as your prompt appears:
 
 ```bash
-# These are set automatically
-TERMY=1                    # Indicates Termy environment
-TERMY_PID=12345           # Termy process ID
-TERMY_TAB_ID=1            # Current tab ID
+TERMY=1                    # Present in every Termy shell
+TERMY_PID=12345            # PID of the Termy process hosting this tab
+TERMY_TAB_ID=1             # Tab ID, unique within the window
+```
+
+Verify they're set:
+
+```bash
+env | grep TERMY
 ```
 
 ### Customizing Your Shell
 
-Add to your `.bashrc` or `.zshrc`:
+Because `TERMY` is only present inside Termy, you can use it to gate Termy-only tweaks in your shell startup file (`.bashrc`, `.zshrc`, `config.fish`, etc.):
 
 ```bash
-# Change prompt when in Termy
+# Add a rocket to your prompt only when you're running inside Termy
 if [ -n "$TERMY" ]; then
     export PS1="🚀 $PS1"
 fi
@@ -1483,6 +1475,8 @@ URL: https://termy.run/docs/installation
 
 # Installation Guide
 
+> For: end users
+
 This comprehensive guide will take you from download to your first terminal prompt. Choose your platform below and follow the step-by-step instructions.
 
 ## Quick Start
@@ -1576,10 +1570,6 @@ Windows SmartScreen may display a security warning because Termy is not code-sig
 - From Start Menu: Press Windows key, type "Termy"
 - Or from Desktop shortcut if created during install
 
-### Portable Install (Coming Soon)
-
-A portable ZIP option is planned for future releases.
-
 ---
 
 ## Linux Installation
@@ -1671,7 +1661,7 @@ cargo build --release
 # The binary will be at target/release/termy
 ```
 
-See [Building from Source](/docs/building) for detailed instructions.
+See [Building from Source](/docs/building-from-source) for detailed instructions.
 
 ---
 
@@ -1742,41 +1732,9 @@ EOF
 
 ---
 
-## Troubleshooting Installation
+## Trouble Installing?
 
-### macOS: "Termy is damaged"
-
-This is the Gatekeeper quarantine. Fix:
-```bash
-sudo xattr -d com.apple.quarantine /Applications/Termy.app
-```
-
-### Windows: "Windows protected your PC"
-
-Click "More info" → "Run anyway"
-
-### Linux: AppImage won't run
-
-Check dependencies:
-```bash
-# Install FUSE if needed (Ubuntu/Debian)
-sudo apt install libfuse2
-
-# Or run without FUSE
-./Termy-*.AppImage --appimage-extract-and-run
-```
-
-### All Platforms: "termy: command not found"
-
-Your shell can't find the binary:
-
-```bash
-# Find where termy is installed
-which termy || find /Applications ~/.local/bin /usr/bin -name "termy" 2>/dev/null
-
-# Add to PATH (adjust path as needed)
-export PATH="$PATH:/Applications/Termy.app/Contents/MacOS"
-```
+If Termy fails to launch, gets blocked by Gatekeeper or SmartScreen, or isn't on your `PATH`, see [Troubleshooting → Installation Issues](/docs/troubleshooting#installation-issues) and [Troubleshooting → Runtime Issues](/docs/troubleshooting#runtime-issues) for platform-specific fixes.
 
 ---
 
@@ -1967,6 +1925,8 @@ URL: https://termy.run/docs/faq
 
 # Frequently Asked Questions
 
+> For: end users
+
 ## General Questions
 
 ### Is Termy free?
@@ -2117,7 +2077,7 @@ Pane splitting is planned for a future release. Currently, use tabs for multiple
 ### Does Termy have scrollback/search?
 
 Yes:
-- Scrollback: Configurable (default 10,000 lines)
+- Scrollback: Configurable (default 2,000 lines; raise `scrollback_history` for more)
 - Search: `Cmd/Ctrl + F` to find in buffer
 - Regex search: Supported
 - Case sensitivity: Toggle with `Cmd/Ctrl + Alt + C`
@@ -2222,11 +2182,7 @@ See [Troubleshooting](/docs/troubleshooting) for detailed solutions.
 
 ### Why does my config not work?
 
-Check:
-1. File is at `~/.config/termy/config.txt`
-2. Syntax is correct: `key = value` (spaces around `=`)
-3. No typos in key names
-4. Font name is exact (case-sensitive)
+The fix is almost always file location, syntax (`key = value` with spaces around `=`), a typo in the key name, or an inexact font name. Full checklist in [Troubleshooting → Config Issues](/docs/troubleshooting#config-issues).
 
 ### How do I report a bug?
 
@@ -2243,45 +2199,6 @@ Check:
 - **Discord**: https://discord.gg/4VDBFD7vAp (fastest response)
 - **GitHub Issues**: https://github.com/lassejlv/termy/issues
 - **GitHub Discussions**: https://github.com/lassejlv/termy/discussions
-
----
-
-## Contributing
-
-### Can I contribute to Termy?
-
-Yes! We welcome:
-- Bug reports
-- Feature requests
-- Code contributions
-- Documentation improvements
-- Theme submissions
-
-See the [GitHub repository](https://github.com/lassejlv/termy) for guidelines.
-
-### How do I build from source?
-
-```bash
-git clone https://github.com/lassejlv/termy.git
-cd termy
-cargo build --release
-```
-
-See [Building from Source](/docs/building-from-source) for detailed instructions.
-
-### Can I create themes for Termy?
-
-Yes! Themes are simple color definitions:
-
-```txt
-[colors]
-background = #1e1e2e
-foreground = #cdd6f4
-blue = #89b4fa
-# ... etc
-```
-
-Submit to the [Theme Store](https://termy.run/themes) once it's live.
 
 ---
 
@@ -2329,6 +2246,8 @@ Can't find your answer? Try:
 URL: https://termy.run/docs/troubleshooting
 
 # Troubleshooting
+
+> For: end users
 
 Having trouble with Termy? This guide covers common issues and their solutions.
 
@@ -2479,8 +2398,6 @@ inactive_tab_scrollback = 1000
 # Instead of custom fonts
 font_family = monospace
 ```
-
-**Disable Animations** (if available in future releases).
 
 ### High CPU Usage
 

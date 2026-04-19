@@ -7,6 +7,8 @@ category: Help & Troubleshooting
 
 # Troubleshooting
 
+> For: end users
+
 Having trouble with Termy? This guide covers common issues and their solutions.
 
 ---
@@ -156,8 +158,6 @@ inactive_tab_scrollback = 1000
 # Instead of custom fonts
 font_family = monospace
 ```
-
-**Disable Animations** (if available in future releases).
 
 ### High CPU Usage
 

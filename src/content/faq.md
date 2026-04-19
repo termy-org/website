@@ -7,6 +7,8 @@ category: Help & Troubleshooting
 
 # Frequently Asked Questions
 
+> For: end users
+
 ## General Questions
 
 ### Is Termy free?
@@ -157,7 +159,7 @@ Pane splitting is planned for a future release. Currently, use tabs for multiple
 ### Does Termy have scrollback/search?
 
 Yes:
-- Scrollback: Configurable (default 10,000 lines)
+- Scrollback: Configurable (default 2,000 lines; raise `scrollback_history` for more)
 - Search: `Cmd/Ctrl + F` to find in buffer
 - Regex search: Supported
 - Case sensitivity: Toggle with `Cmd/Ctrl + Alt + C`
@@ -262,11 +264,7 @@ See [Troubleshooting](/docs/troubleshooting) for detailed solutions.
 
 ### Why does my config not work?
 
-Check:
-1. File is at `~/.config/termy/config.txt`
-2. Syntax is correct: `key = value` (spaces around `=`)
-3. No typos in key names
-4. Font name is exact (case-sensitive)
+The fix is almost always file location, syntax (`key = value` with spaces around `=`), a typo in the key name, or an inexact font name. Full checklist in [Troubleshooting → Config Issues](/docs/troubleshooting#config-issues).
 
 ### How do I report a bug?
 
@@ -283,45 +281,6 @@ Check:
 - **Discord**: https://discord.gg/4VDBFD7vAp (fastest response)
 - **GitHub Issues**: https://github.com/lassejlv/termy/issues
 - **GitHub Discussions**: https://github.com/lassejlv/termy/discussions
-
----
-
-## Contributing
-
-### Can I contribute to Termy?
-
-Yes! We welcome:
-- Bug reports
-- Feature requests
-- Code contributions
-- Documentation improvements
-- Theme submissions
-
-See the [GitHub repository](https://github.com/lassejlv/termy) for guidelines.
-
-### How do I build from source?
-
-```bash
-git clone https://github.com/lassejlv/termy.git
-cd termy
-cargo build --release
-```
-
-See [Building from Source](/docs/building-from-source) for detailed instructions.
-
-### Can I create themes for Termy?
-
-Yes! Themes are simple color definitions:
-
-```txt
-[colors]
-background = #1e1e2e
-foreground = #cdd6f4
-blue = #89b4fa
-# ... etc
-```
-
-Submit to the [Theme Store](https://termy.run/themes) once it's live.
 
 ---
 

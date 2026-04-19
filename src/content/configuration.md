@@ -1,7 +1,7 @@
 ---
 title: Configuration
 description: Configure Termy settings and appearance
-order: 1
+order: 2
 category: Getting Started
 ---
 

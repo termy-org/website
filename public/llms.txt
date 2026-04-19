@@ -15,10 +15,6 @@ It starts in ~8ms, uses ~18MB of memory, and runs natively on macOS, Windows, an
 
 ## Documentation Sections
 
-### Architecture
-
-- [Command Boundary](https://termy.run/docs/architecture/command-boundary) — Ownership boundaries for command and keybind behavior
-
 ### Guides
 
 - [Building from Source](https://termy.run/docs/building-from-source) — Build Termy from source code for development or unsupported platforms

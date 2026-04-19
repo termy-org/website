@@ -7,6 +7,8 @@ category: Getting Started
 
 # Installation Guide
 
+> For: end users
+
 This comprehensive guide will take you from download to your first terminal prompt. Choose your platform below and follow the step-by-step instructions.
 
 ## Quick Start
@@ -100,10 +102,6 @@ Windows SmartScreen may display a security warning because Termy is not code-sig
 - From Start Menu: Press Windows key, type "Termy"
 - Or from Desktop shortcut if created during install
 
-### Portable Install (Coming Soon)
-
-A portable ZIP option is planned for future releases.
-
 ---
 
 ## Linux Installation
@@ -195,7 +193,7 @@ cargo build --release
 # The binary will be at target/release/termy
 ```
 
-See [Building from Source](/docs/building) for detailed instructions.
+See [Building from Source](/docs/building-from-source) for detailed instructions.
 
 ---
 
@@ -266,41 +264,9 @@ EOF
 
 ---
 
-## Troubleshooting Installation
+## Trouble Installing?
 
-### macOS: "Termy is damaged"
-
-This is the Gatekeeper quarantine. Fix:
-```bash
-sudo xattr -d com.apple.quarantine /Applications/Termy.app
-```
-
-### Windows: "Windows protected your PC"
-
-Click "More info" → "Run anyway"
-
-### Linux: AppImage won't run
-
-Check dependencies:
-```bash
-# Install FUSE if needed (Ubuntu/Debian)
-sudo apt install libfuse2
-
-# Or run without FUSE
-./Termy-*.AppImage --appimage-extract-and-run
-```
-
-### All Platforms: "termy: command not found"
-
-Your shell can't find the binary:
-
-```bash
-# Find where termy is installed
-which termy || find /Applications ~/.local/bin /usr/bin -name "termy" 2>/dev/null
-
-# Add to PATH (adjust path as needed)
-export PATH="$PATH:/Applications/Termy.app/Contents/MacOS"
-```
+If Termy fails to launch, gets blocked by Gatekeeper or SmartScreen, or isn't on your `PATH`, see [Troubleshooting → Installation Issues](/docs/troubleshooting#installation-issues) and [Troubleshooting → Runtime Issues](/docs/troubleshooting#runtime-issues) for platform-specific fixes.
 
 ---
 
