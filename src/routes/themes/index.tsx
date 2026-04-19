@@ -35,17 +35,14 @@ function ThemeColorSwatch({ fileUrl }: { fileUrl: string | null }): JSX.Element 
 
   return (
     <div
-      className="flex items-end gap-1 p-3 h-24"
+      className="flex h-14"
       style={{ background: colors.background ?? fallbackPalette.background }}
     >
       {swatchColors.map((color, i) => (
         <div
           key={i}
-          className="flex-1 rounded-sm"
-          style={{
-            backgroundColor: color ?? fallbackPalette.black,
-            height: `${30 + ((i * 17) % 50)}%`,
-          }}
+          className="flex-1"
+          style={{ backgroundColor: color ?? fallbackPalette.black }}
         />
       ))}
     </div>

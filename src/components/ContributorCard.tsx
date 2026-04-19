@@ -5,14 +5,6 @@ import { ActivityChart } from "@/components/ActivityChart";
 interface ContributorCardProps {
   contributor: Contributor;
   rank: number;
-  index: number;
-}
-
-function getRankBadge(rank: number): string | null {
-  if (rank === 1) return "🥇";
-  if (rank === 2) return "🥈";
-  if (rank === 3) return "🥉";
-  return null;
 }
 
 function getTotalAdditions(contributor: Contributor): number {
@@ -29,41 +21,40 @@ function formatNumber(n: number): string {
   return n.toString();
 }
 
-export function ContributorCard({ contributor, rank, index }: ContributorCardProps): JSX.Element {
-  const badge = getRankBadge(rank);
+export function ContributorCard({ contributor, rank }: ContributorCardProps): JSX.Element | null {
+  const author = contributor.author;
+  if (!author) return null;
+
   const additions = getTotalAdditions(contributor);
   const deletions = getTotalDeletions(contributor);
 
   return (
-    <div
-      className="animate-blur-in bg-card/30 border border-border/40 rounded-xl p-5 transition-all hover:border-primary/20 hover:bg-card/60"
-      style={{ animationDelay: `${Math.min(index * 80, 600)}ms` }}
-    >
+    <div className="bg-card/30 border border-border/40 rounded-xl p-5 transition-colors hover:border-primary/20 hover:bg-card/60">
       <div className="flex items-center gap-3 mb-4">
+        <span className="font-mono text-xs text-muted-foreground tabular-nums">
+          {String(rank).padStart(2, "0")}
+        </span>
         <img
-          src={contributor.author.avatar_url}
-          alt={contributor.author.login}
+          src={author.avatar_url}
+          alt={author.login}
           width={48}
           height={48}
           className="rounded-full"
           loading="lazy"
         />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <a
-              href={contributor.author.html_url}
-              target="_blank"
-              rel="noreferrer"
-              className="font-semibold text-foreground hover:text-primary transition-colors truncate"
-            >
-              {contributor.author.login}
-            </a>
-            {badge && <span className="text-lg">{badge}</span>}
-          </div>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
+          <a
+            href={author.html_url}
+            target="_blank"
+            rel="noreferrer"
+            className="font-semibold text-foreground hover:text-primary transition-colors truncate block"
+          >
+            {author.login}
+          </a>
+          <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5 font-mono tabular-nums">
             <span>{contributor.total} commits</span>
-            <span className="text-green-500">+{formatNumber(additions)}</span>
-            <span className="text-red-500">-{formatNumber(deletions)}</span>
+            <span className="text-foreground/60">+{formatNumber(additions)}</span>
+            <span className="text-foreground/40">−{formatNumber(deletions)}</span>
           </div>
         </div>
       </div>

@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, Menu, Moon, Sun, X } from "lucide-react";
-import { motion } from "framer-motion";
 import { type JSX, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/useTheme";
@@ -84,22 +83,15 @@ export function Header(): JSX.Element {
             )}
             <div className="w-px h-4 bg-border/50" />
             
-            {/* Sponsor button with animated heart */}
-            <motion.a
+            <a
               href="https://github.com/sponsors/lassejlv"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              whileHover="hover"
             >
-              <motion.span
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Heart className="w-4 h-4 text-rose-500" fill="currentColor" />
-              </motion.span>
+              <Heart className="w-4 h-4" />
               <span>Sponsor</span>
-            </motion.a>
+            </a>
 
             <button
               onClick={toggleTheme}
@@ -171,7 +163,7 @@ export function Header(): JSX.Element {
                 className="flex items-center gap-2 py-2 text-base text-muted-foreground"
                 onClick={closeMobileMenu}
               >
-                <Heart className="w-4 h-4 text-rose-500" fill="currentColor" />
+                <Heart className="w-4 h-4" />
                 Sponsor
               </a>
               <button

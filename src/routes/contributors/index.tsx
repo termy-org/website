@@ -44,13 +44,12 @@ function ContributorsPage(): JSX.Element {
 
         {hasContributors && contributors && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {contributors.map((contributor) => (
+            {contributors.map((contributor, i) => (
               contributor.author && (
                 <ContributorCard
                   key={contributor.author.id}
                   contributor={contributor}
-                  rank={0}
-                  index={0}
+                  rank={i + 1}
                 />
               )
             ))}

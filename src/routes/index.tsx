@@ -16,11 +16,11 @@ function HomePage() {
       {/* Hero */}
       <section className="w-full flex flex-col items-center text-center pt-40 pb-24">
         <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-5 max-w-lg">
-          Yes A Terminal. Blazingly fast and lightweight.
+          A terminal that gets out of your way.
         </h1>
 
         <p className="text-lg text-muted-foreground max-w-sm mb-10 leading-relaxed">
-          8ms startup, 18MB RAM. The crab approves.
+          ~8ms startup. ~18MB memory. Native on macOS, Windows, and Linux.
         </p>
 
         <div className="flex items-center gap-4">
