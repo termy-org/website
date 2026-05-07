@@ -20,15 +20,28 @@ export interface Contributor {
   author: ContributorAuthor | null;
 }
 
+const CONTRIBUTORS_URL =
+  "https://api.github.com/repos/lassejlv/termy/stats/contributors";
+
 async function fetchContributors(): Promise<Contributor[]> {
-  const res = await fetch("/api/github/contributors");
+  const headers = { Accept: "application/vnd.github+json" };
+
+  let res = await fetch(CONTRIBUTORS_URL, { headers });
+  let retries = 0;
+  while (res.status === 202 && retries < 3) {
+    retries++;
+    await new Promise((r) => setTimeout(r, 2000));
+    res = await fetch(CONTRIBUTORS_URL, { headers });
+  }
 
   if (!res.ok) {
     throw new Error(`Failed to load contributors (${res.status})`);
   }
 
   const contributors: Contributor[] = await res.json();
-  return contributors.filter((c) => c.author !== null);
+  return contributors
+    .filter((c) => c.author !== null)
+    .sort((a, b) => b.total - a.total);
 }
 
 const CONTRIBUTORS_STALE_TIME = 5 * 60_000;

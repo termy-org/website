@@ -7,7 +7,6 @@ import { useTheme } from "@/hooks/useTheme";
 const navLinks = [
   { label: "Features", href: "/#features" },
   { label: "Download", href: "/#download" },
-  { label: "Themes", to: "/themes" },
   { label: "Docs", to: "/docs" },
   { label: "GitHub", href: "https://github.com/lassejlv/termy", external: true },
 ];

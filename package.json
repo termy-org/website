@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:server": "bun --watch server.ts",
     "build": "vite build",
-    "start": "bun server.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -15,12 +13,10 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-query": "^5.90.21",
-    "@usenotra/sdk": "^0.0.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.2",
     "highlight.js": "^11.11.1",
-    "hono": "^4.12.5",
     "lucide-react": "^0.577.0",
     "motion": "^12.35.1",
     "radix-ui": "^1.4.3",

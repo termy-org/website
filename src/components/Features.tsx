@@ -1,12 +1,10 @@
 import type { JSX } from "react";
-import { Link } from "@tanstack/react-router";
 import { Zap, Settings, Monitor, Palette, Gauge, Split } from "lucide-react";
 
 interface Feature {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
-  to?: string;
 }
 
 const features: Feature[] = [
@@ -29,7 +27,6 @@ const features: Feature[] = [
     icon: Palette,
     title: "Themable",
     description: "Built-in themes or create your own.",
-    to: "/themes",
   },
   {
     icon: Gauge,
@@ -44,28 +41,15 @@ const features: Feature[] = [
 ];
 
 function FeatureItem({ feature }: { feature: Feature }): JSX.Element {
-  const content = (
-    <>
+  return (
+    <div className="flex flex-col items-center text-center">
       <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-secondary mb-4">
         <feature.icon className="w-5 h-5 text-foreground" />
       </div>
       <h3 className="text-sm font-medium mb-1">{feature.title}</h3>
       <p className="text-sm text-muted-foreground">{feature.description}</p>
-    </>
+    </div>
   );
-
-  if (feature.to) {
-    return (
-      <Link to={feature.to} className="flex flex-col items-center text-center group">
-        {content}
-        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors mt-1">
-          Browse themes →
-        </span>
-      </Link>
-    );
-  }
-
-  return <div className="flex flex-col items-center text-center">{content}</div>;
 }
 
 export function Features(): JSX.Element {

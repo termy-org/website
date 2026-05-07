@@ -15,22 +15,16 @@ It starts in ~8ms, uses ~18MB of memory, and runs natively on macOS, Windows, an
 
 ## Documentation Sections
 
-### Guides
+### General
 
-- [Building from Source](https://termy.run/docs/building-from-source) — Build Termy from source code for development or unsupported platforms
-- [Customization Guide](https://termy.run/docs/customization-guide) — Deep customization of fonts, themes, appearance, and behavior
-
-### Getting Started
-
-- [Configuration](https://termy.run/docs/configuration) — Configure Termy settings and appearance
-- [First Steps](https://termy.run/docs/first-steps) — Your complete onboarding guide to becoming productive with Termy
-- [Installation](https://termy.run/docs/installation) — Complete guide to installing Termy on macOS, Windows, or Linux
-- [Keybindings](https://termy.run/docs/keybindings) — Keyboard shortcuts and customization
-
-### Help & Troubleshooting
-
-- [FAQ](https://termy.run/docs/faq) — Frequently asked questions about Termy
-- [Troubleshooting](https://termy.run/docs/troubleshooting) — Solutions to common problems and issues
+- [Building From Source](https://termy.run/docs/building-from-source)
+- [Configuration](https://termy.run/docs/configuration)
+- [Customization Guide](https://termy.run/docs/customization-guide)
+- [Faq](https://termy.run/docs/faq)
+- [First Steps](https://termy.run/docs/first-steps)
+- [Installation](https://termy.run/docs/installation)
+- [Keybindings](https://termy.run/docs/keybindings)
+- [Troubleshooting](https://termy.run/docs/troubleshooting)
 
 ## Key Features
 

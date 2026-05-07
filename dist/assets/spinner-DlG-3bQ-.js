@@ -1,0 +1,1 @@
+import{a as e}from"./rolldown-runtime-DDUpfMIz.js";import{w as t}from"./vendor-markdown-Cst79Ndk.js";var n=e(t(),1);function r(){return(0,n.jsx)(`div`,{className:`flex items-center justify-center py-12`,children:(0,n.jsx)(`div`,{className:`animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent`})})}export{r as t};

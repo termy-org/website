@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
-const API_URL = "/api/github/releases/latest";
+const API_URL =
+  "https://api.github.com/repos/lassejlv/termy/releases/latest";
 
 export interface Asset {
   name: string;
